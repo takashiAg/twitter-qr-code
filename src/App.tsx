@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./App.css";
 import { QRCode } from "react-qrcode-logo";
 import styled from "styled-components";
@@ -30,15 +30,15 @@ const Input = styled.input`
   flex-grow: 0;
 `;
 
-const Button = styled.button`
-  width: 100%;
-  height: 50px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  flex-shrink: 0;
-  flex-grow: 0;
-`;
+// const Button = styled.button`
+//   width: 100%;
+//   height: 50px;
+//   box-sizing: border-box;
+//   border: 1px solid #ccc;
+//   border-radius: 4px;
+//   flex-shrink: 0;
+//   flex-grow: 0;
+// `;
 
 const Label = styled.label<{ label?: string }>`
   display: flex;
@@ -164,15 +164,15 @@ function App() {
   //   }
   // };
 
-  const genImageLink = async () => {
+  const genImageLink = useCallback(async () => {
     const canvas = getCanvas();
     if (!canvas) return;
     const ref = canvas.toDataURL("image/png");
     setImageLink(ref);
-  };
+  }, []);
   useEffect(() => {
     genImageLink();
-  }, [count]);
+  }, [count, genImageLink]);
 
   useEffect(() => {
     setInterval(() => {
