@@ -69,6 +69,10 @@ const Text = styled.p`
   white-space: pre-wrap;
 `;
 
+const Img = styled.img`
+  width: 200px;
+`;
+
 const TWITTER_URL = "https://twitter.com/:userId";
 
 function App() {
@@ -77,6 +81,8 @@ function App() {
   const [iconUrl, setIconUrl] = useState<string | undefined>();
   const [width, setWidth] = useState<number>(100);
   const [height, setHeight] = useState<number>(100);
+  const [imageLink, setImageLink] = useState<string | undefined>();
+  const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
     if (!icon) return;
@@ -131,15 +137,48 @@ function App() {
     return canvas;
   };
 
-  const handleDownloadImage = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  // const getCanvasBlob = (): Promise<Blob | undefined> => {
+  //   return new Promise((resolve) => {
+  //     const canvas = getCanvas();
+  //     if (!canvas) return resolve(undefined);
+  //     canvas.toBlob((blob) => {
+  //       if (!blob) return resolve(undefined);
+  //       resolve(blob);
+  //     });
+  //   });
+  // };
+
+  // const handleDownloadImage = async (
+  //   e: React.MouseEvent<HTMLButtonElement>
+  // ) => {
+  //   try {
+  //     e.preventDefault();
+  //     const canvas = getCanvas();
+  //     if (!canvas) return alert("QRコードが生成されていません");
+  //     const a = document.createElement("a");
+  //     a.href = canvas.toDataURL("image/png");
+  //     a.download = `twitterqr${userId}.png`;
+  //     a.click();
+  //   } catch (e) {
+  //     alert((e as any)?.message);
+  //   }
+  // };
+
+  const genImageLink = async () => {
     const canvas = getCanvas();
-    if (!canvas) return alert("QRコードが生成されていません");
-    const a = document.createElement("a");
-    a.href = canvas.toDataURL("image/png");
-    a.download = `twitterqr${userId}.png`;
-    a.click();
+    if (!canvas) return;
+    const ref = canvas.toDataURL("image/png");
+    setImageLink(ref);
   };
+  useEffect(() => {
+    genImageLink();
+  }, [count]);
+
+  useEffect(() => {
+    setInterval(() => {
+      setCount((count) => count + 1);
+    }, 1000);
+  }, [setCount]);
 
   // useEffect(() => {
   //   if (!icon) return;
@@ -166,7 +205,7 @@ function App() {
       </Label>
 
       {userId && (
-        <>
+        <span style={{ display: "none" }}>
           <QRCode
             value={TWITTER_URL.replace(":userId", userId)}
             logoImage={iconUrl}
@@ -176,10 +215,9 @@ function App() {
             ecLevel="H"
             id={ID}
           />
-
-          <Button onClick={handleDownloadImage}>画像としてダウンロード</Button>
-        </>
+        </span>
       )}
+      <Img src={imageLink} alt="" />
     </Container>
   );
 }
